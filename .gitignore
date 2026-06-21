@@ -1,0 +1,15 @@
+# Secrets and runtime auth — never commit
+.env
+*.env
+!.env.example
+
+# Runtime logs (mounted volume)
+logs/
+*.log
+
+# Security reports — local-only, never commit (may detail live vulns/secrets)
+SECURITY_REPORT.md
+
+# Python
+__pycache__/
+*.pyc

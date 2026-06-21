@@ -105,9 +105,51 @@ If `SELECT_TOKEN` is set, give each URL the auth header, e.g.:
 }
 ```
 
+## Alternative: a single "TV-style" tile (`homebridge-viewport-tv/`)
+
+If you'd rather have **one** tile with a pick-one list instead of N switches,
+this repo bundles a small Homebridge plugin in [`homebridge-viewport-tv/`](homebridge-viewport-tv/)
+that exposes the Viewport as a HomeKit **Television** accessory — each Live View
+is an "input". It reads the view list + current view from `GET /health` and
+selects via `POST /select/on`, so the service needs no extra endpoints.
+
+Install it into a Homebridge that uses `--strict-plugin-resolution` (the
+official `homebridge/homebridge` Docker image does) by registering it as a
+`file:` dependency so the boot-time install picks it up:
+
+```bash
+# copy the plugin where Homebridge can install from, then declare it
+cp -r homebridge-viewport-tv <homebridge-dir>/plugins-src/homebridge-viewport-tv
+#   add to <homebridge-dir>/package.json dependencies:
+#     "homebridge-viewport-tv": "file:plugins-src/homebridge-viewport-tv"
+docker exec -w /homebridge homebridge npm install ./plugins-src/homebridge-viewport-tv
+```
+
+Then add the platform to `config.json` and restart Homebridge:
+
+```jsonc
+"platforms": [
+  {
+    "platform": "ViewportTV",
+    "name": "Viewport",
+    "baseUrl": "http://127.0.0.1:8787",
+    "token": "<SELECT_TOKEN>",
+    "pollInterval": 4
+  }
+]
+```
+
+It publishes an **external** accessory (TVs can't be bridged) that still appears
+under the same bridge pairing. In the Home app the tile lives under the TV remote
+UI: opening it shows the input list; the current view is checkmarked and stays in
+sync via the `pollInterval` (seconds). Trade-off vs. the radio switches: one tile,
+but selecting a view is tap-to-open then pick rather than a single tap.
+
 ## Notes
 
 - Driving multiple viewports (`VIEWPORT_NAME=A,B`) moves them together; the tile
   state reflects the first/primary viewport.
+- When HomeKit first discovers the TV accessory it may push an initial input,
+  which can switch the Viewport once; just pick the view you want afterwards.
 - If the Viewport is showing a built-in layout (not one of your Live Views), all
   tiles read `0` until you pick a view.

@@ -1,0 +1,14 @@
+{
+  "name": "homebridge-viewport-tv",
+  "version": "1.0.0",
+  "description": "Single HomeKit Television-style selector for a UniFi Protect Viewport's Live View (companion to unifiprotect-viewport-selector).",
+  "main": "index.js",
+  "engines": {
+    "homebridge": ">=1.6.0",
+    "node": ">=18"
+  },
+  "keywords": [
+    "homebridge-plugin"
+  ],
+  "license": "MIT"
+}

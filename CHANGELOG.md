@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 — single-tile TV selector
+
+- Add `homebridge-viewport-tv/`, a small Homebridge platform plugin that exposes
+  the Viewport as one HomeKit **Television** accessory whose inputs are the Live
+  Views — a single-tile alternative to the per-view radio switches. Reads views +
+  current from `GET /health`, selects via `POST /select/on`; no new service
+  endpoints. Publishes as an external accessory; install via a `file:` dependency
+  for Homebridge's strict plugin resolution.
+
 ## 0.1.0 — initial release
 
 HomeKit Live-View selector for a UniFi Protect Viewport.

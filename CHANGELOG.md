@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 — hardening + multi-instance docs
+
+- Constant-time bearer-token comparison (`hmac.compare_digest`) in the auth check.
+- Pin `requests` in the Dockerfile for reproducible builds.
+- README: document running multiple instances (e.g. home + camp) from shared
+  source, the per-console local-account gotcha, and the stock Home app TV-UI
+  caveat (why the radio switches are the better default).
+- Add `SECURITY_REPORT.md` (LAN-only assessment; no CRITICAL/HIGH findings, repo
+  verified secret-free). Report is git-ignored.
+
 ## 0.2.0 — single-tile TV selector
 
 - Add `homebridge-viewport-tv/`, a small Homebridge platform plugin that exposes

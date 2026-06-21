@@ -17,6 +17,7 @@ login flow as the sibling unifiprotect-viewport project.
 from __future__ import annotations
 
 import base64
+import hmac
 import html as html_lib
 import json
 import logging
@@ -297,7 +298,8 @@ class Handler(BaseHTTPRequestHandler):
         token = self.config.select_token
         if not token:
             return True  # auth disabled
-        return self.headers.get("Authorization", "") == f"Bearer {token}"
+        # Constant-time compare to avoid a token-length/prefix timing side-channel.
+        return hmac.compare_digest(self.headers.get("Authorization", ""), f"Bearer {token}")
 
     def _drain_body(self):
         length = min(int(self.headers.get("Content-Length", 0)), MAX_BODY)

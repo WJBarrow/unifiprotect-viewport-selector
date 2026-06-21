@@ -145,6 +145,40 @@ UI: opening it shows the input list; the current view is checkmarked and stays i
 sync via the `pollInterval` (seconds). Trade-off vs. the radio switches: one tile,
 but selecting a view is tap-to-open then pick rather than a single tap.
 
+> Note: the stock Home app renders a Television accessory with a mandatory On/Off
+> power button and hides the full input list under *Settings → Inputs* — that UI is
+> fixed by Apple. If you want "tap in, see every view, one tap to pick", the
+> radio-button switches above are the better fit. The TV tile shines when you have
+> many views and prefer a single tile.
+
+## Running multiple instances (e.g. home + camp)
+
+Each instance drives **one** UniFi OS console / Protect NVR. To control viewports
+on a second site, run a second container pointed at that NVR on its own port —
+reusing this same source so there's only one `service.py` to maintain:
+
+```yaml
+# ../my-selector-camp/docker-compose.yml
+services:
+  service:
+    build: ../unifiprotect-viewport-selector   # shared source
+    restart: unless-stopped
+    ports: ["${HTTP_PORT:-8788}:${HTTP_PORT:-8788}"]
+    env_file: [.env]                            # camp NVR creds, HTTP_PORT=8788
+    volumes: ["./logs:/app/logs"]
+```
+
+Give the second instance its own `SELECT_TOKEN`, and name its Homebridge tiles
+distinctly (e.g. `Camp Viewport: <view>`) so they don't collide with the first
+set. One host-networked Homebridge can drive any number of instances over
+`127.0.0.1:<port>`.
+
+**Per-console account gotcha:** UniFi accounts are per-device. The gateway and the
+Protect NVR are often *separate devices with separate local admin accounts* — and a
+cloud (SSO) login won't authenticate against the API at all. Point `UNIFI_HOST` at
+the device that actually runs **Protect** (the NVR/NAS/Cloud Key), and use a
+**local** admin account that exists on *that* device.
+
 ## Notes
 
 - Driving multiple viewports (`VIEWPORT_NAME=A,B`) moves them together; the tile

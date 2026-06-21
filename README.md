@@ -187,3 +187,8 @@ the device that actually runs **Protect** (the NVR/NAS/Cloud Key), and use a
   which can switch the Viewport once; just pick the view you want afterwards.
 - If the Viewport is showing a built-in layout (not one of your Live Views), all
   tiles read `0` until you pick a view.
+
+## License
+
+[MIT](LICENSE) © Warren Barrow. Not affiliated with or endorsed by Ubiquiti Inc.;
+"UniFi" and "UniFi Protect" are trademarks of Ubiquiti.

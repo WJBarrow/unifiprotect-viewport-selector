@@ -140,14 +140,29 @@ class ViewportClient:
         url = f"{self.config.unifi_host}{path}"
         try:
             r = self.s.request(method, url, headers=self._headers(), timeout=15, **kw)
-            if r.status_code in (401, 403):
+            # An expired session can come back as 401/403 *or* as 200 with the
+            # UniFi OS login SPA (HTML) instead of JSON — re-login once either way.
+            if r.status_code in (401, 403) or self._not_json(r):
                 self.login()
                 r = self.s.request(method, url, headers=self._headers(), timeout=15, **kw)
         except requests.RequestException as e:
             raise ProtectError(f"cannot reach {self.config.unifi_host}: {e}") from e
         if r.status_code >= 400:
             raise ProtectError(f"{method} {path} -> HTTP {r.status_code}: {r.text[:200]}")
+        if self._not_json(r):
+            raise ProtectError(
+                f"{method} {path} -> HTTP {r.status_code} non-JSON response "
+                f"(content-type={r.headers.get('Content-Type')!r}) — session invalid?"
+            )
         return r.json() if r.content else {}
+
+    @staticmethod
+    def _not_json(r) -> bool:
+        """True when a response body exists but clearly isn't JSON (login SPA etc.)."""
+        if not r.content:
+            return False
+        ctype = (r.headers.get("Content-Type") or "").lower()
+        return "json" not in ctype
 
     # --- domain -----------------------------------------------------------
     def _bootstrap(self) -> dict:
